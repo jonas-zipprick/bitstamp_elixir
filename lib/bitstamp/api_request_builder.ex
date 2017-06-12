@@ -1,6 +1,6 @@
-defmodule BitcoinDe.ApiRequestBuilder do
-  alias BitcoinDe.ApiRequest, as: ApiRequest
-  alias BitcoinDe.Credentials, as: Credentials 
+defmodule Bitstamp.ApiRequestBuilder do
+  alias Bitstamp.ApiRequest, as: ApiRequest
+  alias Bitstamp.Credentials, as: Credentials 
 
   @typedoc """
   all the information neccessary to construct an api_request
@@ -24,7 +24,7 @@ defmodule BitcoinDe.ApiRequestBuilder do
     end
   end
     
-  @spec url_encode(params) :: BitcoinDe.url_query 
+  @spec url_encode(params) :: Bitstamp.url_query 
   defp url_encode(params) do
     url_encode(params, "")
   end
@@ -54,29 +54,13 @@ defmodule BitcoinDe.ApiRequestBuilder do
                 |> url_encode
 
     uri = Enum.join([
-      "https://api.bitcoin.de",
+      "https://www.bitstamp.net/api",
       api_request.path,
       (if api_request.method == :get && url_query != "", do: "?", else: ""),
       (if api_request.method == :get, do: url_query, else: "")
     ])
 
-    md5_hash = 
-      if api_request.method == :post do
-        :crypto.hash(:md5, url_query) 
-        |> Base.encode16() 
-        |> String.downcase
-      else 
-        # md5 of ""
-        "d41d8cd98f00b204e9800998ecf8427e"
-      end
-
-
-    hmac_data = Enum.join([
-      (if api_request.method == :post, do: "POST", else: "GET"),
-      uri,
-      (credentials |> Map.fetch!(:key)),
-      (api_request.nonce |> Kernel.inspect),
-      md5_hash], "#")
+    hmac_data = (api_request.nonce |> inspect) <> (credentials.customer_id |> inspect) <> (credentials.key |> inspect)
 
     signature = credentials 
                 |> Map.fetch!(:secret)
@@ -84,31 +68,17 @@ defmodule BitcoinDe.ApiRequestBuilder do
                 |> Base.encode16
                 |> String.downcase
 
-    %ApiRequest{api_request | uri: uri, signature: signature}
+    %ApiRequest{api_request | uri: uri, signature: signature, api_key: credentials.key}
   end
 
   defp nonce() do
     :os.system_time(:millisecond)
   end
 
-  @spec show_orderbook(%Credentials{}, atom, number, number) :: %ApiRequest{}
-  def show_orderbook(credentials = %Credentials{}, type, amount \\ nil, price \\ nil) do
-    params = [type: type, amount: amount, price: price]  
-    %ApiRequest{method: :get, path: "/v1/orders", nonce: nonce()} 
-    |> add_signature(params, credentials)
-  end
-
-  @spec show_public_trade_history(%Credentials{}, number) :: %ApiRequest{}
-  def show_public_trade_history(credentials = %Credentials{}, since_tid \\ nil) do
-    params = [since_tid: since_tid]
-    %ApiRequest{method: :get, path: "/v1/trades/history", nonce: nonce()} 
-    |> add_signature(params, credentials)
-  end
-
-  @spec show_account_info(%Credentials{}) :: %ApiRequest{}
-  def show_account_info(credentials = %Credentials{}) do
-    params = []
-    %ApiRequest{method: :get, path: "/v1/account", nonce: nonce()} 
+  @spec order_book(%Credentials{}) :: %ApiRequest{}
+  def order_book(credentials = %Credentials{}) do
+    params = []  
+    %ApiRequest{method: :get, path: "/v2/order_book/btceur", nonce: nonce()} 
     |> add_signature(params, credentials)
   end
 end

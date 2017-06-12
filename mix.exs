@@ -3,7 +3,7 @@ defmodule BitcoinDe.Mixfile do
 
   def project do
     [
-      app: :bitcoin_de,
+      app: :bitstamp,
       version: "0.2.0",
       elixir: "~> 1.4",
       build_embedded: Mix.env == :prod,
@@ -11,8 +11,8 @@ defmodule BitcoinDe.Mixfile do
       description: description(),
       package: package(),
       deps: deps(),
-      name: "BitcoinDe",
-      source_url: "https://github.com/balugege/bitcoin-de-elixir"
+      name: "Bitstamp",
+      source_url: "https://github.com/balugege/bitstamp_elixir"
     ]
   end
 
@@ -29,16 +29,16 @@ defmodule BitcoinDe.Mixfile do
   end
 
   defp description do
-    "Elixir API wrapper for www.bitcoin.de an online bitcoin marketplace."
+    "Elixir API wrapper for bitstamp."
   end
 
   defp package do
     [
-      name: :bitcoin_de,
+      name: :bitstamp,
       files: ["lib", "mix.exs", "README.md"],
       maintainers: ["Jonas Zipprick"],
       licenses: ["Apache 2.0"],
-      links: %{"GitHub" => "https://github.com/balugege/bitcoin-de-elixir"}
+      links: %{"GitHub" => "https://github.com/balugege/bitstamp_elixir"}
     ]
   end
 end

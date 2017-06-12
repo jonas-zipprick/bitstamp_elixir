@@ -1,20 +1,20 @@
-defmodule BitcoinDe do
+defmodule Bitstamp do
   use GenServer 
   require Logger
-  alias BitcoinDe.ApiRequestBuilder, as: ApiRequestBuilder
-  alias BitcoinDe.ApiRequest, as: ApiRequest
+  alias Bitstamp.ApiRequestBuilder, as: ApiRequestBuilder
+  alias Bitstamp.ApiRequest, as: ApiRequest
 
   @moduledoc """
-  A Client for bitcoin.de
+  A Client for bitstamp 
   """
 
   @doc """
-  Start the connection to bitcoin.de
+  Start the connection to
   ## Examples
-      iex> BitcoinDe.start_link(self(), %BitcoinDe.Credentials{key: "xxxxx", secret: "xxxxx"})
+      iex> Bitstamp.start_link(self(), %Bitstamp.Credentials{key: "xxxxx", secret: "xxxxx"})
       {:ok, #PID<0.204.0>}
   """
-  def start_link(parent, credentials = %BitcoinDe.Credentials{}) do
+  def start_link(parent, credentials = %Bitstamp.Credentials{}) do
     GenServer.start_link(__MODULE__, {parent, credentials}) 
   end
 
