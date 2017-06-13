@@ -15,6 +15,5 @@ defmodule BitstampTest do
   test "account balance", state do
     {:ok, pid} = state[:pid]
     {:ok, result} = GenServer.call(pid, {:balance}, 10000)
-    IO.inspect result
   end
 end

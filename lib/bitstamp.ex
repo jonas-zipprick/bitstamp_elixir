@@ -34,7 +34,7 @@ defmodule Bitstamp do
 
   @spec evaluate(%ApiRequest{}, tuple) :: %HTTPoison.Response{}
   defp evaluate(api_request = %ApiRequest{method: :get}, {_, credentials}) do
-    response = HTTPoison.get api_request.uri
+    response = HTTPoison.get api_request.uri, [], [recv_timeout: 8000]
     case response do
       {:ok, %HTTPoison.Response{status_code: 400, body: body}} ->
         {:err, Poison.decode!(body)}
@@ -45,7 +45,7 @@ defmodule Bitstamp do
 
   @spec evaluate(%ApiRequest{}, tuple) :: %HTTPoison.Response{}
   defp evaluate(api_request = %ApiRequest{method: :post}, {_, credentials}) do
-    response = HTTPoison.post api_request.uri, {:form, api_request.url_query}, %{"Content-type" => "application/x-www-form-urlencoded"} 
+    response = HTTPoison.post api_request.uri, {:form, api_request.url_query}, %{"Content-type" => "application/x-www-form-urlencoded"}, [recv_timeout: 8000]
     case response do
       {:ok, %HTTPoison.Response{status_code: 400, body: body}} ->
          {:err, Poison.decode!(body)}
