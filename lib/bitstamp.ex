@@ -34,7 +34,6 @@ defmodule Bitstamp do
 
   @spec evaluate(%ApiRequest{}, tuple) :: %HTTPoison.Response{}
   defp evaluate(api_request = %ApiRequest{method: :get}, {_, credentials}) do
-    IO.inspect api_request
     response = HTTPoison.get api_request.uri
     case response do
       {:ok, %HTTPoison.Response{status_code: 400, body: body}} ->
@@ -46,7 +45,6 @@ defmodule Bitstamp do
 
   @spec evaluate(%ApiRequest{}, tuple) :: %HTTPoison.Response{}
   defp evaluate(api_request = %ApiRequest{method: :post}, {_, credentials}) do
-    IO.inspect api_request
     response = HTTPoison.post api_request.uri, {:form, api_request.url_query}, %{"Content-type" => "application/x-www-form-urlencoded"} 
     case response do
       {:ok, %HTTPoison.Response{status_code: 400, body: body}} ->
