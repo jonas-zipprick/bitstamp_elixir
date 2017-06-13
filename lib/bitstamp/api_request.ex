@@ -1,3 +1,3 @@
 defmodule Bitstamp.ApiRequest do
-  defstruct [:method, :path, :uri, :nonce, :signature, :api_key]
+  defstruct [:method, :path, :uri, :url_query]
 end

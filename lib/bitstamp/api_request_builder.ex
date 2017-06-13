@@ -24,51 +24,36 @@ defmodule Bitstamp.ApiRequestBuilder do
     end
   end
     
-  @spec url_encode(params) :: Bitstamp.url_query 
-  defp url_encode(params) do
-    url_encode(params, "")
-  end
-
-  defp url_encode([], url_query) do
-    url_query
-  end
-
-  defp url_encode([head | tail], url_query) do
-    url_query = url_query <> unless (url_query == ""), do: "&", else: ""
-    url_query = head
-                |> elem(0)
-                |> Kernel.inspect
-                |> (&(url_query <> &1 <> "=")).()
-    url_query = head
-                |> elem(1)
-                |> Kernel.inspect
-                |> (&(url_query <> &1)).()
-    url_encode(tail, url_query)
-  end
-
   @spec add_signature(%ApiRequest{}, params, %Credentials{}) :: %ApiRequest{} 
-  defp add_signature(api_request = %ApiRequest{}, params, credentials = %Credentials{}) do
-    url_query = params 
-                |> Enum.filter(fn({_, v}) -> v != nil end) 
-                |> sort 
-                |> url_encode
-
+  defp add_signature(api_request = %ApiRequest{method: :get}, credentials = %Credentials{}) do
     uri = Enum.join([
       "https://www.bitstamp.net/api",
-      api_request.path,
-      (if api_request.method == :get && url_query != "", do: "?", else: ""),
-      (if api_request.method == :get, do: url_query, else: "")
+      api_request.path
     ])
 
-    hmac_data = (api_request.nonce |> inspect) <> (credentials.customer_id |> inspect) <> (credentials.key |> inspect)
+    %ApiRequest{api_request | uri: uri}
+  end
 
+  defp add_signature(api_request = %ApiRequest{}, params, credentials = %Credentials{}) do
+    nonce = nonce()
+
+    hmac_data = (nonce |> inspect) <> (credentials.customer_id |> inspect) <> credentials.key
     signature = credentials 
                 |> Map.fetch!(:secret)
                 |> (&(:crypto.hmac(:sha256, &1, hmac_data))).()
                 |> Base.encode16
-                |> String.downcase
 
-    %ApiRequest{api_request | uri: uri, signature: signature, api_key: credentials.key}
+    params = params ++ [key: credentials.key, signature: signature, nonce: nonce]
+    url_query = params 
+                |> Enum.filter(fn({_, v}) -> v != nil end) 
+                |> sort 
+
+    uri = Enum.join([
+      "https://www.bitstamp.net/api",
+      api_request.path
+    ])
+
+    %ApiRequest{api_request | uri: uri, url_query: params}
   end
 
   defp nonce() do
@@ -78,7 +63,14 @@ defmodule Bitstamp.ApiRequestBuilder do
   @spec order_book(%Credentials{}) :: %ApiRequest{}
   def order_book(credentials = %Credentials{}) do
     params = []  
-    %ApiRequest{method: :get, path: "/v2/order_book/btceur", nonce: nonce()} 
+    %ApiRequest{method: :get, path: "/v2/order_book/btceur/"} 
+    |> add_signature(params, credentials)
+  end
+
+  @spec balance(%Credentials{}) :: %ApiRequest{}
+  def balance(credentials = %Credentials{}) do
+    params = []  
+    %ApiRequest{method: :post, path: "/v2/balance/btceur/"} 
     |> add_signature(params, credentials)
   end
 end
