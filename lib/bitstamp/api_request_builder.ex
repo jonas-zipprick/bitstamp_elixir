@@ -73,4 +73,16 @@ defmodule Bitstamp.ApiRequestBuilder do
     %ApiRequest{method: :post, path: "/v2/balance/btceur/"} 
     |> add_signature(params, credentials)
   end
+
+  @spec buy_limit_order(%Credentials{}, params) :: %ApiRequest{}
+  def buy_limit_order(credentials = %Credentials{}, params = [amount: amount, price: price, limit_price: limit_price]) do
+    %ApiRequest{method: :post, path: "/v2/buy/btceur/"}
+    |> add_signature(params, credentials)
+  end
+
+  @spec sell_limit_order(%Credentials{}, params) :: %ApiRequest{}
+  def sell_limit_order(credentials = %Credentials{}, params = [amount: amount, price: price, limit_price: limit_price]) do
+    %ApiRequest{method: :post, path: "/v2/buy/btceur/"}
+    |> add_signature(params, credentials)
+  end
 end

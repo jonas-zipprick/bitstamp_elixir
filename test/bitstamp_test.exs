@@ -16,4 +16,15 @@ defmodule BitstampTest do
     {:ok, pid} = state[:pid]
     {:ok, result} = GenServer.call(pid, {:balance}, 10000)
   end
+
+  test "buy limit order", state do
+    {:ok, pid} = state[:pid] 
+    {:ok, result} = GenServer.call(pid, {:buy_limit_order, [[amount: "0.1", price: "100.0", limit_price: "105.34"]]}, 10000)
+    IO.inspect result
+  end
+
+  test "sell limit order", state do
+    {:ok, pid} = state[:pid] 
+    {:ok, result} = GenServer.call(pid, {:sell_limit_order, [[amount: "0.1", price: "123456.7", limit_price: "123456.0"]]}, 10000)
+  end
 end
