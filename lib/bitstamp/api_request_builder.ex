@@ -89,4 +89,10 @@ defmodule Bitstamp.ApiRequestBuilder do
     %ApiRequest{method: :post, path: "/v2/open_orders/btceur/"} 
     |> add_signature(params, credentials)
   end
+
+  @spec order_status(%Credentials{}, params) :: %ApiRequest{}
+  def order_status(credentials = %Credentials{}, params = [id: id]) do
+    %ApiRequest{method: :post, path: "/order_status/"}
+    |> add_signature(params, credentials)
+  end
 end
