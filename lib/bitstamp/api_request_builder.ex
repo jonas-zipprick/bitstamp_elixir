@@ -44,9 +44,6 @@ defmodule Bitstamp.ApiRequestBuilder do
                 |> Base.encode16
 
     params = params ++ [key: credentials.key, signature: signature, nonce: nonce]
-    url_query = params 
-                |> Enum.filter(fn({_, v}) -> v != nil end) 
-                |> sort 
 
     uri = Enum.join([
       "https://www.bitstamp.net/api",
@@ -83,6 +80,13 @@ defmodule Bitstamp.ApiRequestBuilder do
   @spec sell_limit_order(%Credentials{}, params) :: %ApiRequest{}
   def sell_limit_order(credentials = %Credentials{}, params = [amount: amount, price: price, limit_price: limit_price]) do
     %ApiRequest{method: :post, path: "/v2/buy/btceur/"}
+    |> add_signature(params, credentials)
+  end
+
+  @spec open_orders(%Credentials{}) :: %ApiRequest{}
+  def open_orders(credentials = %Credentials{}) do
+    params = []  
+    %ApiRequest{method: :post, path: "/v2/open_orders/btceur/"} 
     |> add_signature(params, credentials)
   end
 end
